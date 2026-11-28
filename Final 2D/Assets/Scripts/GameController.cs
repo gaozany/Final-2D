@@ -13,6 +13,7 @@ public class GameController : MonoBehaviour
     //      that the player is required to kick.
     // This variable should be editable from the inspector.
 
+    private readonly List<GameObject> _requiredItems = new List<GameObject>();
     private int _commonPoints;
     private int _uncommonPoints;
     private int _rarePoints;
@@ -24,7 +25,13 @@ public class GameController : MonoBehaviour
     {
         SetGameEnabled(false);
 
-        // Tell the HUD what the required items are.
+        Kickable[] kickableItems = FindObjectsByType<Kickable>(FindObjectsSortMode.None);
+        foreach (Kickable kickableItem in kickableItems)
+        {
+            _requiredItems.Add(kickableItem.gameObject);
+        }
+
+        _hud.SetRequiredItems(_requiredItems);
     }
 
     // ------------------------------------------------------------------------
@@ -87,16 +94,22 @@ public class GameController : MonoBehaviour
     }
 
     // ------------------------------------------------------------------------
-    // You will need to ADD PARAMETERS to this method to represent the GameObject
-    //  kicked and the rarity of that object.
-    public void Kicked()
+    public void Kicked(GameObject kickedObject, ItemRarity rarity)
     {
-        // Use a switch statement.
-        // Based on the rarity of the object kicked, change the number of points
-        //      for that rarity category.
-        
+        switch (rarity)
+        {
+            case ItemRarity.Common:
+                _commonPoints++;
+                break;
+            case ItemRarity.Uncommon:
+                _uncommonPoints++;
+                break;
+            case ItemRarity.Rare:
+                _rarePoints++;
+                break;
+        }
 
-        // Tell the HUD what item was kicked, and how many points we now have.
-        
+        _hud.KickedItem(kickedObject);
+        _hud.UpdatePointsText(_commonPoints, _uncommonPoints, _rarePoints);
     }
 }

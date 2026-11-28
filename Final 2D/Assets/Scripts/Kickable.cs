@@ -1,12 +1,17 @@
 using UnityEngine;
 
-// Add an enum to represent an item's rarity.
+public enum ItemRarity
+{
+    Common,
+    Uncommon,
+    Rare
+}
 
 public class Kickable : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private GameObject _explosionVfxPrefab;
-    // Add a member variable to represent this item's rarity.
+    [SerializeField] private ItemRarity _rarity = ItemRarity.Common;
 
     private bool _wasKicked;
     private GameController _gameController;
@@ -15,30 +20,48 @@ public class Kickable : MonoBehaviour
     // You don't need to code in this method :)
     private void Start ()
     {
+        if (_rigidbody == null)
+        {
+            _rigidbody = GetComponent<Rigidbody2D>();
+        }
+
         _gameController = GameObject.FindFirstObjectByType<GameController>();
     }
 
     // ------------------------------------------------------------------------
     public void Kick(Vector3 force)
     {
-        // Set the 'was kicked' flag.
+        if (_wasKicked || _rigidbody == null)
+        {
+            return;
+        }
 
-        // Add the input force to the rigidbody to make the item fly.
+        _wasKicked = true;
+        _rigidbody.AddForce(force, ForceMode2D.Impulse);
 
-        // Let the GameController know this object was kicked.
+        if (_gameController != null)
+        {
+            _gameController.Kicked(gameObject, _rarity);
+        }
     }
 
     // ------------------------------------------------------------------------
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // If this object was kicked, explode.
+        if (_wasKicked)
+        {
+            Explode();
+        }
     }
 
     // ------------------------------------------------------------------------
     private void Explode()
     {
-        // Create the explosion VFX.
+        if (_explosionVfxPrefab != null)
+        {
+            Instantiate(_explosionVfxPrefab, transform.position, Quaternion.identity);
+        }
 
-        // Destroy this item.
+        Destroy(gameObject);
     }
 }

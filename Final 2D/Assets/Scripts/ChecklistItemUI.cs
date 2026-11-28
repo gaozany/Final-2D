@@ -7,21 +7,29 @@ public class ChecklistItemUI : MonoBehaviour
     [SerializeField] private Image _checkImage;
     [SerializeField] private Sprite _filledCheckSprite;
 
-    public GameObject _requiredItem;
+    [SerializeField] private GameObject _requiredItem;
+    public GameObject RequiredItem => _requiredItem;
 
     // ------------------------------------------------------------------------
     public void SetItem (GameObject itemObject)
     {
-        // Store the required itemObject in _requiredItem.
+        _requiredItem = itemObject;
 
-        // Change our item sprite to the itemObject's SpriteRenderer's sprite.
+        SpriteRenderer itemRenderer = itemObject.GetComponent<SpriteRenderer>();
+        if (_itemImage != null && itemRenderer != null)
+        {
+            _itemImage.sprite = itemRenderer.sprite;
+        }
 
     }
 
     // ------------------------------------------------------------------------
     public void FoundItem ()
     {
-        // Change our checkbox sprite to the filled checkbox version.
+        if (_checkImage != null && _filledCheckSprite != null)
+        {
+            _checkImage.sprite = _filledCheckSprite;
+        }
     }
 
 }
